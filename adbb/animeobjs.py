@@ -939,6 +939,7 @@ class File(AniDBObj):
             finfo['mylist_viewdate'] = self.db_data.mylist_viewdate
             finfo['mylist_source'] = self.db_data.mylist_source
             finfo['mylist_other'] = self.db_data.mylist_other
+            finfo['mylist_filestate'] = self.db_data.mylist_filestate
             finfo['lid'] = None
             self.remove_from_mylist()
             self._is_generic = False
@@ -976,6 +977,7 @@ class File(AniDBObj):
         if update_mylist:
             self.update_mylist(
                     state = self.db_data.mylist_state,
+                    file_state = self.db_data.mylist_filestate,
                     watched = self.db_data.mylist_viewdate,
                     source = self.db_data.mylist_source,
                     other = self.db_data.mylist_other)
@@ -1251,6 +1253,7 @@ class File(AniDBObj):
     def update_mylist(
             self,
             state=None,
+            file_state=None,
             watched=None,
             source=None,
             other=None):
@@ -1372,6 +1375,8 @@ class File(AniDBObj):
                 self.db_data.mylist_source = source
             if other:
                 self.db_data.mylist_other = other
+            if file_state:
+                self.db_data.mylist_filestate = file_state
             self._db_commit(sess)
             self._close_db_session(sess)
         else:

@@ -200,7 +200,7 @@ roman_numbering = {
 }
 
 anime_map_a = ['aid', 'unused', 'year', 'type', 'related_aid_list', 'related_aid_type', 'retired', 'retired',
-               'not_implemented', 'not_implemented', 'not_implemented', 'not_implemented', 'not_implemented',
+               'title', 'not_implemented', 'not_implemented', 'not_implemented', 'not_implemented',
                'not_implemented', 'retired', 'retired',
                'nr_of_episodes', 'highest_episode_number', 'special_ep_count', 'air_date', 'end_date', 'url', 'picname',
                'retired',

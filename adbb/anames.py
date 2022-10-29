@@ -231,7 +231,7 @@ def _read_xml_into_etree(filePath):
 def _read_language_file():
     global languages
     languages = {}
-    with open(iso_639_file, "r") as f:
+    with open(iso_639_file, "r", encoding="utf-8_sig") as f:
         for line in f:
             three, tree2, two, eng, fre = line.strip().split('|')
             if two:
