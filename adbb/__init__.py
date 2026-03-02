@@ -82,7 +82,7 @@ def init(
         nrc = None
 
     # unless both username and password is given; look for credentials in netrc
-    if not (api_user and api_pass) or db_only:
+    if not (api_user and api_pass) and not db_only:
         if not nrc:
             raise Exception("User and passwords are required if no netrc file exists")
         for host in ['api.anidb.net', 'api.anidb.info', 'anidb.net']:
