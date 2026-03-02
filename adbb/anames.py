@@ -19,20 +19,13 @@ import datetime
 import difflib
 import gzip
 import os
-import sys
 import tempfile
 import time
 import xml.etree.ElementTree as etree
 
-if sys.version_info[0] < 3:
-    import urllib2 as local_urllib
-    urllib = local_urllib
-    urllib.error = local_urllib
-    urllib.request = local_urllib
-else:
-    import urllib
-    import urllib.error
-    import urllib.request
+import urllib
+import urllib.error
+import urllib.request
 
 import adbb.animeobjs
 from adbb.errors import AniDBError, AniDBFileError
