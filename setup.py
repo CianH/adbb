@@ -39,7 +39,7 @@ setup(
             'pycryptodome',
             'sqlalchemy'
             ],
-        extras_requires={
+        extras_require={
             'jellyfin': ['jellyfin_apiclient_python']
             }
         )
