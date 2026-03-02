@@ -38,7 +38,6 @@ class AnimeTable(Base):
     # TODO dateflags?
     year = Column(String(16), nullable=False)
     type = Column(String(16), nullable=False)
-    title = Column(String(256), nullable=False)
 
     nr_of_episodes = Column(Integer, nullable=False)
     highest_episode_number = Column(Integer, nullable=False)
