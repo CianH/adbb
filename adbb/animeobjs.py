@@ -356,7 +356,7 @@ class Anime(AniDBObj):
                 url = urllib.parse.urljoin(base_url, f'/v3/movies/{i}')
                 req = urllib.request.Request(url, headers=headers)
                 try:
-                    with urllib.request.urlopen(req) as f:
+                    with urllib.request.urlopen(req, timeout=30) as f:
                         res = json.loads(f.read())
                 except urllib.error.HTTPError as e:
                     if e.code != 404:
@@ -372,7 +372,7 @@ class Anime(AniDBObj):
             url = urllib.parse.urljoin(base_url, f'/v3/tv/{tv_id}')
             req = urllib.request.Request(url, headers=headers)
             try:
-                with urllib.request.urlopen(req) as f:
+                with urllib.request.urlopen(req, timeout=30) as f:
                     res = json.loads(f.read())
             except urllib.error.HTTPError as e:
                 if e.code != 404:

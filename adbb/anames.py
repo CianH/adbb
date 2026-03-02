@@ -79,7 +79,7 @@ def update_xml(url):
                     'User-Agent': _animetitles_useragent
                 }
             )
-            res = urllib.request.urlopen(req)
+            res = urllib.request.urlopen(req, timeout=30)
             adbb.log.info(f'Fetching cache file from {url}')
             f.write(res.read())
     except (IOError, urllib.error.URLError) as err:

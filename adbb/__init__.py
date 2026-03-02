@@ -156,7 +156,7 @@ def download_image(filehandle, obj):
     url_base = 'https://cdn.anidb.net/images/main'
     url=f'{url_base}/{obj.picname}'
     req = urllib.request.Request(url)
-    with urllib.request.urlopen(req) as f:
+    with urllib.request.urlopen(req, timeout=30) as f:
         filehandle.write(f.read())
 
 
@@ -173,7 +173,7 @@ def download_fanart(filehandle, url, preview=False):
         my_url = urllib.parse.urlparse(url)._replace(scheme='https', path=urllib.parse.quote(my_url.path))
 
     req = urllib.request.Request(my_url.geturl(), headers={'api-key': fanart_key})
-    with urllib.request.urlopen(req) as f:
+    with urllib.request.urlopen(req, timeout=30) as f:
         filehandle.write(f.read())
 
 def close():
