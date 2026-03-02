@@ -213,7 +213,7 @@ def fsop(source, target, link=False, dry_run=False, skip_clean=False, companion_
                         shutil.move(path, target_path)
                     except OSError:
                         shutil.copy2(path, target_path)
-                        os.remove(f)
+                        os.remove(path)
             continue
 
         # Link
