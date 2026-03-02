@@ -614,7 +614,7 @@ class File(AniDBObj):
     _anime = None
     _episode = None
     _group = None
-    _multiep = []
+    _multiep = None
     _fid = None
     _path = None
     _size = None
