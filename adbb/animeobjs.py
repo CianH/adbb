@@ -980,11 +980,83 @@ class File(AniDBObj):
                     source = self.db_data.mylist_source,
                     other = self.db_data.mylist_other)
 
+    @staticmethod
+    def _parse_eprange(eprange_str):
+        """Parse AniDB episode range string (e.g. '1-3,5,7-10') into a set of
+        episode number strings."""
+        eps = set()
+        if not eprange_str:
+            return eps
+        for part in str(eprange_str).split(','):
+            part = part.strip()
+            if not part:
+                continue
+            if '-' in part:
+                try:
+                    start, end = part.split('-', 1)
+                    for i in range(int(start), int(end) + 1):
+                        eps.add(str(i))
+                except ValueError:
+                    eps.add(part)
+            else:
+                eps.add(part)
+        return eps
+
     def _anidb_mylist_data_callback(self, res):
         new = None
         if res.rescode == '312':
+            # Multiple mylist entries for this episode. The 312 response
+            # contains aggregate per-state episode ranges instead of per-file
+            # data. Extract what we can for this episode.
+            data = res.datalines[0] if res.datalines else {}
+            epno = str(self.episode.episode_number) if self.episode else None
+            mylist_state = None
+            mylist_viewed = False
+
+            if epno:
+                if epno in self._parse_eprange(data.get('hddeps', '')):
+                    mylist_state = 'on hdd'
+                elif epno in self._parse_eprange(data.get('cdeps', '')):
+                    mylist_state = 'on cd'
+                elif epno in self._parse_eprange(data.get('deletedeps', '')):
+                    mylist_state = 'deleted'
+                elif epno in self._parse_eprange(data.get('unknowneps', '')):
+                    mylist_state = 'unknown'
+                if epno in self._parse_eprange(data.get('watchedeps', '')):
+                    mylist_viewed = True
+
+            groups = []
+            if 'gshortname' in data and 'geps' in data:
+                gnames = data['gshortname'] if isinstance(data['gshortname'], list) else [data['gshortname']]
+                geps = data['geps'] if isinstance(data['geps'], list) else [data['geps']]
+                for gname, gep in zip(gnames, geps):
+                    if epno and epno in self._parse_eprange(gep):
+                        groups.append(gname)
+
+            self._multientry = True
+            self._multientry_mylist_state = mylist_state
+            self._multientry_mylist_viewed = mylist_viewed
+            self._multientry_groups = groups
+
+            # Set local vars so __getattr__ resolves them even without db_data
+            self._mylist_state = mylist_state
+            self._mylist_viewed = mylist_viewed
+
+            # Populate db_data fields if we have a db entry, so attribute
+            # access on the File object returns the aggregate data
+            if self.db_data:
+                state_num = [k for k, v in adbb.mapper.mylist_state_map.items()
+                             if v == mylist_state]
+                if state_num:
+                    self.db_data.mylist_state = mylist_state
+                self.db_data.mylist_viewed = mylist_viewed
+
             self._mylist_updated.set()
-            raise AniDBFileError("adbb currently does not support multiple mylist entries for a single episode")
+            adbb.log.info(
+                "Multiple mylist entries for episode %s: state=%s, "
+                "watched=%s, groups=%s (data not cached)",
+                epno, mylist_state, mylist_viewed, groups)
+            return
         elif res.rescode == '321':
             self._mylist_updated.set()
             return
