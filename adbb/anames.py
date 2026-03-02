@@ -107,7 +107,7 @@ def update_anilist():
     xml_file = update_xml(_anime_list_url)
     if not xml_file and not anilist:
         adbb.log.critical("Missing, and unable to fetch, list of anime mappings")
-        sys.exit(2)
+        raise AniDBFileError("Missing, and unable to fetch, list of anime mappings")
     xml = _read_anidb_xml(xml_file)
     absolute_order = {}
 
@@ -189,7 +189,7 @@ def update_animetitles():
     xml_file = update_xml(_animetitles_url)
     if not xml_file and not titles:
         adbb.log.critical("Missing, and unable to fetch, list of anime titles")
-        sys.exit(2)
+        raise AniDBFileError("Missing, and unable to fetch, list of anime titles")
     titles = _read_anidb_xml(xml_file)
 
 

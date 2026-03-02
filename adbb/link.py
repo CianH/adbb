@@ -344,7 +344,7 @@ class AniDBListener(threading.Thread):
                     code=int(data[:3])
                 except ValueError:
                     adbb.log.critical(f"Unparseable response from API: {repr(data)}")
-                    sys.exit(2)
+                    raise AniDBPacketCorruptedError(f"Unparseable response from API: {repr(data)}")
                 reason = resp.resstr
                 if code in (600, 601, 602, 604):
                     self._sender.set_banned(code=code, reason=reason)
@@ -359,7 +359,7 @@ class AniDBListener(threading.Thread):
                         self._sender.reauthenticate()
                 else:
                     adbb.log.critical(f'Unhandled response from API: {repr(data)}')
-                    sys.exit(2)
+                    raise AniDBInternalError(f'Unhandled response from API: {repr(data)}')
                 self._last_receive = time()
                 continue
             resp = resp.resolve(cmd)
