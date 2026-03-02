@@ -253,7 +253,7 @@ class AniDBLink(threading.Thread):
         if not self._banned:
             self._banned = 1
         else:
-            self._banned *= 2
+            self._banned = min(self._banned * 2, 8)
         with self._auth_lock:
             self._authenticating.clear()
         self.reauthenticate()
