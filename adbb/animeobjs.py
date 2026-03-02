@@ -392,6 +392,9 @@ class Anime(AniDBObj):
             return NotImplemented
         return self.aid == other.aid
 
+    def __hash__(self):
+        return hash(self._aid)
+
     def __contains__(self, other):
         if not isinstance(other, Episode):
             return NotImplemented
@@ -601,6 +604,9 @@ class Episode(AniDBObj):
         if self._episode_number and other._episode_number:
             return self._episode_number == other._episode_number
         return self.eid == other.eid or self.lid == other.lid
+
+    def __hash__(self):
+        return hash(self._eid) if self._eid else 0
 
     def __repr__(self):
         return "Episode(anime={}, episode_number='{}', eid={})".format(
@@ -1530,6 +1536,9 @@ class File(AniDBObj):
         if self._is_generic and other.is_generic:
             return self.episode == other.episode
         return False
+
+    def __hash__(self):
+        return hash(self._fid) if self._fid else 0
 
     def __len__(self):
         return len(self.multiep)
