@@ -356,7 +356,7 @@ class EncryptCommand(Command):
 
 class EncodingCommand(Command):
     def __init__(self, name):
-        parameters = {'name': type}
+        parameters = {'name': name}
         Command.__init__(self, 'ENCODING', **parameters)
 
 
