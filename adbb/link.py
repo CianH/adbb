@@ -323,13 +323,12 @@ class AniDBListener(threading.Thread):
                     data = self.decrypt(data)
                 except ValueError:
                     pass
-            for i in range(2):
-                tmp = data
-                resp = None
-                if tmp[:2] == b'\x00\x00':
-                    tmp = zlib.decompressobj().decompress(tmp[2:])
-                    adbb.log.debug("UnZip | %s" % repr(tmp))
-                resp = ResponseResolver(tmp)
+            tmp = data
+            resp = None
+            if tmp[:2] == b'\x00\x00':
+                tmp = zlib.decompressobj().decompress(tmp[2:])
+                adbb.log.debug("UnZip | %s" % repr(tmp))
+            resp = ResponseResolver(tmp)
             if not resp:
                 adbb.log.warning(f"Invalid response: {data}")
                 continue
