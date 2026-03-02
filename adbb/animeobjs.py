@@ -156,7 +156,7 @@ class AniDBObj(object):
             local_name = "_{}".format(name)
             # adbb._log.debug("Requested attribute {} (in local_vars: {})".format(
             #    name, local_name in local_vars))
-            if local_name in local_vars and local_vars[local_name]:
+            if local_name in local_vars and local_vars[local_name] is not None:
                 return local_vars[local_name]
 
         super(AniDBObj, self).__getattribute__('_updating').acquire()
