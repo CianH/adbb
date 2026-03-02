@@ -119,7 +119,7 @@ class AniDBObj(object):
             self._db_commit(sess)
             self._close_db_session(sess)
 
-            if random.randint(0, 100) <= refresh_probability:
+            if random.randint(1, 100) <= refresh_probability:
                 self.update(block=block)
 
     def _send_anidb_update_req(self):
