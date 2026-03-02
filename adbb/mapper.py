@@ -49,7 +49,8 @@ mylist_state_map = {
     '0': 'unknown',
     '1': 'on hdd',
     '2': 'on cd',
-    '3': 'deleted'
+    '3': 'deleted',
+    '4': 'remote storage'
 }
 
 mylist_filestate_map = {
