@@ -1529,6 +1529,7 @@ class File(AniDBObj):
             return True
         if self._is_generic and other.is_generic:
             return self.episode == other.episode
+        return False
 
     def __len__(self):
         return len(self.multiep)
