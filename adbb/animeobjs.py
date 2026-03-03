@@ -1276,14 +1276,15 @@ class File(AniDBObj):
                 # if 'entrycnt' is > 1 this is actually the lid...
                 # ... which is good I guess, because we want it.
                 adbb.log.debug("lines from MYLISTADD command: {}".format(res.datalines))
+                entry_count = 0
                 if 'entries' in res.datalines[0]:
-                    res = int(res.datalines[0]['entries'])
+                    entry_count = int(res.datalines[0]['entries'])
                 elif 'entrycnt' in res.datalines[0]:
-                    res = int(res.datalines[0]['entrycnt'])
-                if res > 1:
+                    entry_count = int(res.datalines[0]['entrycnt'])
+                if entry_count > 1:
                     sess = self._get_db_session()
                     self.db_data = sess.merge(self.db_data)
-                    self.db_data.update(lid=res)
+                    self.db_data.update(lid=entry_count)
                     self._db_commit(sess)
                     self._close_db_session(sess)
             wait.set()
