@@ -299,6 +299,11 @@ class AniDBListener(threading.Thread):
     def decrypt(self, data):
         data = self._cipher.decrypt(data)
         pad_len = data[-1]
+        if pad_len < 1 or pad_len > 16:
+            raise AniDBPacketCorruptedError(
+                "Invalid PKCS5 padding length: {}".format(pad_len))
+        if data[-pad_len:] != bytes([pad_len]) * pad_len:
+            raise AniDBPacketCorruptedError("Invalid PKCS5 padding bytes")
         return data[:-pad_len]
 
 
