@@ -246,7 +246,7 @@ class GroupTable(Base):
     __tablename__ = 'group'
 
     pk = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True)
-    gid = Column(BigInteger().with_variant(Integer, "sqlite"), index=True)
+    gid = Column(BigInteger().with_variant(Integer, "sqlite"), unique=True, index=True)
     rating = Column(BigInteger().with_variant(Integer, "sqlite"))
     votes = Column(BigInteger().with_variant(Integer, "sqlite"))
     acount = Column(BigInteger().with_variant(Integer, "sqlite"))
