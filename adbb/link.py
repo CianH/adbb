@@ -50,6 +50,7 @@ class AniDBLink(threading.Thread):
         self._banned = 0
 
         self._current_tag = 0
+        self._tag_lock = threading.Lock()
         self._myport = myport
         self._nat_ping_interval = nat_ping_interval
         self._do_ping = False
@@ -124,13 +125,14 @@ class AniDBLink(threading.Thread):
         adbb.log.info(f"Logged in to AniDB with session {self._session}")
 
     def _new_tag(self):
-        if self._current_tag >= 999:
-            self._current_tag = 0
-            newtag = "TOOO"
-        else:
-            self._current_tag += 1
-            newtag = "T{:03d}".format(self._current_tag)
-        return newtag
+        with self._tag_lock:
+            if self._current_tag >= 999:
+                self._current_tag = 0
+                newtag = "TOOO"
+            else:
+                self._current_tag += 1
+                newtag = "T{:03d}".format(self._current_tag)
+            return newtag
 
     def _do_delay(self):
         if self._banned > 0:
@@ -356,7 +358,7 @@ class AniDBListener(threading.Thread):
                     # We get here if an encrypted session has timed out
                     # No need to log in again if all that's left in queue is a
                     # logout command.
-                    if all([x.command == 'LOGOUT' for x in self.cmd_queue.values()]):
+                    if all([x.command == 'LOGOUT' for x in list(self.cmd_queue.values())]):
                         self.stop()
                     else:
                         adbb.log.warning('Lost encrypted session with AniDB; attempting to reauthenticate')
@@ -391,7 +393,7 @@ class AniDBListener(threading.Thread):
         willpop = []
         cmd = None
         now = time()
-        for tag, cmd in self.cmd_queue.items():
+        for tag, cmd in list(self.cmd_queue.items()):
             if not tag:
                 continue
             if cmd.started:
