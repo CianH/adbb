@@ -16,9 +16,11 @@
 # along with adbb.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from sqlalchemy import *
-from sqlalchemy.orm import *
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import (
+    BigInteger, Boolean, Column, Date, DateTime, Enum,
+    Float, ForeignKey, Integer, String, Unicode, create_engine,
+)
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 Base = declarative_base()
 

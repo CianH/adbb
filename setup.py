@@ -37,7 +37,7 @@ setup(
             },
         install_requires=[
             'pycryptodome',
-            'sqlalchemy'
+            'sqlalchemy>=1.4'
             ],
         extras_require={
             'jellyfin': ['jellyfin_apiclient_python']

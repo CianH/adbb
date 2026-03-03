@@ -1,2 +1,2 @@
 [build-system]
-requires = ["setuptools", "wheel", "pycryptodome", "sqlalchemy"]
+requires = ["setuptools", "wheel", "pycryptodome", "sqlalchemy>=1.4"]
