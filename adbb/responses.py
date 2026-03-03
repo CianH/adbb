@@ -424,7 +424,8 @@ class MylistResponse(Response):
             'mylist_viewdate',
             'mylist_storage',
             'mylist_source',
-            'mylist_other')
+            'mylist_other',
+            'mylist_filestate')
         self.coderep = ()
 
 
