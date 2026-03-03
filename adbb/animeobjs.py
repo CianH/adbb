@@ -162,9 +162,11 @@ class AniDBObj(object):
         super(AniDBObj, self).__getattribute__('_updating').acquire()
         super(AniDBObj, self).__getattribute__('_updating').release()
         super(AniDBObj, self).__getattribute__('update_if_old')()
-        # Not quite sure, but something-something db_data missing-something...
         if name == 'relations':
-            relations = self.relations
+            db_data = super(AniDBObj, self).__getattribute__('db_data')
+            if db_data is None:
+                return None
+            relations = db_data.relations
             if isinstance(relations, list):
                 return relations
             return relations()
