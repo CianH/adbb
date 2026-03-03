@@ -345,9 +345,9 @@ class Anime(AniDBObj):
         if movie_ids:
             all_ids = []
             for i in movie_ids:
-                if type(i) == str:
+                if isinstance(i, str):
                     all_ids.append(i)
-                elif type(i) == list:
+                elif isinstance(i, list):
                     all_ids.extend(i)
             movie_ids = all_ids
 
@@ -440,7 +440,7 @@ class Episode(AniDBObj):
                 my_ep = int(self.episode_number)
             except ValueError:
                 return res
-            if type(ep) == tuple:
+            if isinstance(ep, tuple):
                 epno, part = ep
                 if my_ep == 1:
                     res = (season, epno)
@@ -453,7 +453,7 @@ class Episode(AniDBObj):
             return None
         mdbid = None
         anime = self.anime
-        if type(ids) == str:
+        if isinstance(ids, str):
             ids = [ids]
         if len(ids) == anime.nr_of_episodes:
             # Sometimes anidb adds parts of a movie as episodes > 1, so
