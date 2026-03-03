@@ -311,7 +311,7 @@ class GroupRelationTable(Base):
         return '<GroupRelationTable(pk={pk}, group_pk={group}, related_gid={related}, ' \
                'type={type})>'.format(
                 pk=self.pk,
-                anime=self.group_pk,
+                group=self.group_pk,
                 related=self.related_gid,
                 type=self.relation_type)
 
