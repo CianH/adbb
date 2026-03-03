@@ -159,6 +159,14 @@ class AniDBObj(object):
             if local_name in local_vars and local_vars[local_name] is not None:
                 return local_vars[local_name]
 
+        # If db_data is already populated and doesn't have this attribute,
+        # raise immediately without wasting a rate-limited API call
+        db_data = super(AniDBObj, self).__getattribute__('db_data')
+        if db_data is not None and not hasattr(db_data, name) and name != 'relations':
+            raise AttributeError(
+                "'{cls}' object has no attribute '{name}'".format(
+                    cls=type(self).__name__, name=name))
+
         super(AniDBObj, self).__getattribute__('_updating').acquire()
         super(AniDBObj, self).__getattribute__('_updating').release()
         super(AniDBObj, self).__getattribute__('update_if_old')()
@@ -170,7 +178,15 @@ class AniDBObj(object):
             if isinstance(relations, list):
                 return relations
             return relations()
-        return getattr(super(AniDBObj, self).__getattribute__('db_data'), name, None)
+        db_data = super(AniDBObj, self).__getattribute__('db_data')
+        if db_data is not None:
+            try:
+                return getattr(db_data, name)
+            except AttributeError:
+                raise AttributeError(
+                    "'{cls}' object has no attribute '{name}'".format(
+                        cls=type(self).__name__, name=name))
+        return None
 
 
 class Anime(AniDBObj):
