@@ -107,22 +107,23 @@ def init(
     if nrc:
         # if no password is given in sql-url we try to look it up
         # in netrc
-        parts=sql_db_url.split('/')
-        if parts[2] and not ':' in parts[2]:
-            if '@' in parts[2]:
-                username, host = parts[2].split('@')
-            else:
-                username, host = (None, parts[2])
+        parsed = urllib.parse.urlparse(sql_db_url)
+        if parsed.hostname and not parsed.password:
             try:
-                u, _account, password = nrc.authenticators(host)
+                u, _account, password = nrc.authenticators(parsed.hostname)
             except TypeError:
                 u, password = (None, None)
             if password:
-                if not username:
-                    username = u
+                username = parsed.username or u
                 if username == u:
-                    parts[2] = f'{username}:{password}@{host}'
-        sql_db_url='/'.join(parts)
+                    userinfo = '{}:{}@'.format(
+                        urllib.parse.quote(username, safe=''),
+                        urllib.parse.quote(password, safe=''))
+                    hostinfo = parsed.hostname
+                    if parsed.port:
+                        hostinfo += ':{}'.format(parsed.port)
+                    sql_db_url = parsed._replace(
+                        netloc=userinfo + hostinfo).geturl()
         
         if not fanart_key:
             for host in ['fanart.tv', 'assets.fanart.tv', 'webservice.fanart.tv', 'api.fanart.tv']:
