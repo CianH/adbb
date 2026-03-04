@@ -37,6 +37,9 @@ iso_639_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "ISO-639-2
 _update_interval = datetime.timedelta(hours=36)
 
 titles = None
+_anime_titles = None
+_title_to_aids = None
+_all_title_pairs = None
 anilist = None
 absolute_order_set = None
 languages = None
@@ -184,6 +187,7 @@ def update_animetitles():
         adbb.log.critical("Missing, and unable to fetch, list of anime titles")
         raise AniDBFileError("Missing, and unable to fetch, list of anime titles")
     titles = _read_anidb_xml(xml_file)
+    _build_title_index()
 
 
 def _verify_xml_file(path):
@@ -240,47 +244,93 @@ def get_lang_code(short):
     return None
     
 
+def _build_title_index():
+    """Pre-compute lookup structures from the titles XML.
+
+    Called once after XML load. Builds:
+    - _anime_titles: {aid: [AnimeTitle, ...]} for O(1) aid lookup
+    - _title_to_aids: {lowercase_title: set(aid)} for O(1) exact match
+    - _all_title_pairs: [(aid, title_text), ...] for fuzzy fallback
+    """
+    global _anime_titles, _title_to_aids, _all_title_pairs
+    _anime_titles = {}
+    _title_to_aids = {}
+    _all_title_pairs = []
+
+    for anime in titles.findall('anime'):
+        aid = int(anime.get('aid'))
+        anime_title_objs = [
+            adbb.animeobjs.AnimeTitle(
+                x.get('type'),
+                get_lang_code(x.get(
+                    '{http://www.w3.org/XML/1998/namespace}lang')),
+                x.text) for x in anime.findall('title')]
+        _anime_titles[aid] = anime_title_objs
+
+        for title_obj in anime_title_objs:
+            lower = title_obj.title.lower()
+            if lower not in _title_to_aids:
+                _title_to_aids[lower] = set()
+            _title_to_aids[lower].add(aid)
+            _all_title_pairs.append((aid, title_obj.title))
+
+
 def get_titles(name=None, aid=None, max_results=10, score_for_match=0.8):
     global titles
-    res = []
 
-    if titles is None:
+    if _anime_titles is None:
         update_animetitles()
-    if titles is None:
+    if _anime_titles is None:
         raise AniDBFileError('Could not get valid title cache file.')
 
-    lastAid = None
-    for anime in titles.findall('anime'):
-        score=0
-        best_title_match=None
-        exact_match=None
-        if aid and aid == int(anime.get('aid')):
-            exact_match=anime.get('aid')
+    # Aid lookup — O(1)
+    if aid and not name:
+        if aid in _anime_titles:
+            return [(aid, _anime_titles[aid], 1.0, None)]
+        return []
 
-        if name:
-            name = name.replace('⁄', '/')
-            for title in anime.findall('title'):
-                if name.lower() in title.text.lower():
-                    exact_match=title.text
-                diff = difflib.SequenceMatcher(a=name, b=title.text)
-                title_score = diff.ratio()
-                if title_score > score:
-                    score = title_score
-                    best_title_match=title.text
+    # Name lookup
+    if name:
+        name = name.replace('\u2044', '/')
+        name_lower = name.lower()
+        res = []
+        seen_aids = set()
 
-        if score > score_for_match or exact_match:
-            matched_titles = [
-                    adbb.animeobjs.AnimeTitle(
-                        x.get('type'),
-                        get_lang_code(x.get('{http://www.w3.org/XML/1998/namespace}lang')),
-                        x.text) for x in anime.findall('title')]
-            res.append((int(anime.get('aid')), matched_titles, score, best_title_match))
+        # Phase 1: exact title match — O(1)
+        if name_lower in _title_to_aids:
+            for matched_aid in _title_to_aids[name_lower]:
+                seen_aids.add(matched_aid)
+                res.append((
+                    matched_aid, _anime_titles[matched_aid],
+                    1.0, name))
 
-    res.sort(key=lambda x: x[2], reverse=True)
-    
-    # response is a list of tuples in the form:
-    #(<aid>, <list of titles>, <score of best title>, <best title>)
-    return res[:max_results]
+        if len(res) >= max_results:
+            res.sort(key=lambda x: x[2], reverse=True)
+            return res[:max_results]
+
+        # Phase 2: substring + fuzzy on pre-computed flat list
+        aid_scores = {}
+        for pair_aid, pair_title in _all_title_pairs:
+            if pair_aid in seen_aids:
+                continue
+            is_substring = name_lower in pair_title.lower()
+            title_score = difflib.SequenceMatcher(
+                a=name, b=pair_title).ratio()
+            if pair_aid not in aid_scores \
+                    or title_score > aid_scores[pair_aid][0]:
+                aid_scores[pair_aid] = (
+                    title_score, pair_title, is_substring)
+
+        for scored_aid, (score, best_title, is_sub) in aid_scores.items():
+            if score > score_for_match or is_sub:
+                res.append((
+                    scored_aid, _anime_titles[scored_aid],
+                    score, best_title))
+
+        res.sort(key=lambda x: x[2], reverse=True)
+        return res[:max_results]
+
+    return []
 
 
 def anilist_maps(aid):
