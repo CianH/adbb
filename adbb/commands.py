@@ -16,8 +16,7 @@
 # along with adbb.  If not, see <http://www.gnu.org/licenses/>.
 
 from threading import Lock
-from adbb.responses import *
-from adbb.errors import *
+from adbb.errors import AniDBIncorrectParameterError
 
 import adbb.db as db
 

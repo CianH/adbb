@@ -12,8 +12,8 @@ import time
 import adbb
 import adbb.anames
 import adbb.fileinfo
-from adbb.errors import *
-from adbb.db import *
+from adbb.errors import IllegalAnimeObject
+from adbb.db import AnimeTable, EpisodeTable, FileTable, GroupTable
 import sqlalchemy.exc
 
 status_msg=None

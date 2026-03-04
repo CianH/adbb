@@ -31,9 +31,15 @@ import adbb
 import adbb.anames
 import adbb.mapper
 import adbb.fileinfo
-from adbb.db import *
-from adbb.commands import *
-from adbb.errors import *
+from adbb.db import (
+    AnimeRelationTable, AnimeTable, EpisodeTable,
+    FileTable, GroupRelationTable, GroupTable,
+)
+from adbb.commands import (
+    AnimeCommand, EpisodeCommand, FileCommand, GroupCommand,
+    MyListAddCommand, MyListCommand, MyListDelCommand,
+)
+from adbb.errors import AniDBError, IllegalAnimeObject
 
 
 

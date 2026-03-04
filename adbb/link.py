@@ -23,7 +23,7 @@ from time import time, sleep
 from collections import deque
 
 from adbb.responses import ResponseResolver
-from adbb.errors import *
+from adbb.errors import AniDBInternalError, AniDBMustAuthError, AniDBPacketCorruptedError
 import adbb.commands
 
 from Crypto.Cipher import AES

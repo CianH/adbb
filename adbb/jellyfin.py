@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 import adbb
 import adbb.anames
 import adbb.utils
-from adbb.errors import *
+from adbb.errors import IllegalAnimeObject
 import sqlalchemy.exc
 
 # Specials-directories as defined by jellyfin
